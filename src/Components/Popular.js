@@ -3,9 +3,10 @@ import { useGlobalContext } from "../context/global";
 import { Link } from "react-router-dom";
 import { posterUrl } from "../context/global";
 import styled from "styled-components";
+import NotFound from "../img/NotFound.png";
 
 const Popular = () => {
-  const { updatesAnime, isSearch } = useGlobalContext();
+  const { updatesAnime, isSearch, searchResults } = useGlobalContext();
 
   const conditionalRender = () => {
     if (!isSearch) {
@@ -29,13 +30,44 @@ const Popular = () => {
           </AnimeCard>
         </AnimeLink>
       ));
+    } else if (searchResults.length > 0) {
+      return searchResults.map((anime) => (
+        <AnimeLink to={`/anime/${anime.id}`} key={anime.id}>
+          <AnimeCard>
+            <AnimeCardImg
+              src={`${posterUrl}${anime.id}.webp`}
+              alt={anime.code}
+            />
+            <AnimeCardContent>
+              <div className="title">
+                <h3>{anime.names.ru}</h3>
+              </div>
+              <div className="genres">
+                {anime.genres.map((genre, index) => (
+                  <p key={index}>{genre}</p>
+                ))}
+              </div>
+            </AnimeCardContent>
+          </AnimeCard>
+        </AnimeLink>
+      ));
+    } else {
+      return (
+        <div className="center-grid-item">
+
+        <SorrySearch>
+          <img src={NotFound} alt="notFound" loading="lazy" />
+          <h2>Ничего не найдено :(</h2>
+        </SorrySearch>
+        </div>
+      );
     }
   };
 
   return (
-    <PopularStyled>
-      <div className="popular-anime">{conditionalRender()}</div>
-    </PopularStyled>
+      <PopularStyled>
+        <div className="popular-anime">{conditionalRender()}</div>
+      </PopularStyled>
   );
 };
 
@@ -54,6 +86,12 @@ const PopularStyled = styled.div`
     background-color: #141414;
     border-top: 5px solid #2c2c2c;
     overflow: hidden;
+  }
+  .center-grid-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-column: span 5; // Adjust the grid-column span based on your grid layout
   }
   overflow: hidden;
 `;
@@ -100,7 +138,7 @@ const AnimeCardContent = styled.div`
       max-width: 100%;
     }
   }
-  
+
   .genres {
     display: flex;
     flex-wrap: wrap;
@@ -114,6 +152,26 @@ const AnimeCardContent = styled.div`
       color: #bbbbbb;
       font-size: 14px;
     }
+  }
+`;
+
+const SorrySearch = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  img {
+    height: auto;
+    max-width: 150px;
+    display: block;
+  }
+  h2 {
+    text-align: center;
+    margin: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    color: #fff;
   }
 `;
 
